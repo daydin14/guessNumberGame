@@ -17,7 +17,7 @@ const game = {
   getGuess: function () {
     while (this.guess !== "quit") {
       this.guess = prompt(
-        `Enter a guess between ${this.smallestNum} and ${this.biggestNum} or 'quit' to exit: \n Secret num = ${this.secretNum}`
+        `Enter a guess between ${this.smallestNum} and ${this.biggestNum} or 'quit' to exit:`
       );
       if (this.guess !== "quit") {
         this.guess = parseInt(this.guess);
