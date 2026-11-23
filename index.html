@@ -1,14 +1,75 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
-    <script src="script.js"></script>
-    <title>Document</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description"
+    content="A simple number guessing game. Choose a range and see how quickly you can find the number." />
+  <link rel="stylesheet" href="style.css" />
+  <script src="script.js" defer></script>
+  <title>Guess the Number</title>
 </head>
+
 <body>
-    
+  <main class="page-shell">
+    <header class="intro">
+      <p class="eyebrow">A little game of chance</p>
+      <h1>Guess the Number</h1>
+      <p>Pick a range, then use the clues to find the hidden number.</p>
+    </header>
+
+    <section class="game-card" aria-labelledby="game-title">
+      <div class="card-heading">
+        <p class="eyebrow">Ready when you are</p>
+        <h2 id="game-title">Choose your range</h2>
+      </div>
+
+      <form id="setup-form" class="setup-form">
+        <div class="range-fields">
+          <label>
+            Minimum
+            <input id="minimum" name="minimum" type="number" value="1" step="1" required />
+          </label>
+          <label>
+            Maximum
+            <input id="maximum" name="maximum" type="number" value="10" step="1" required />
+          </label>
+        </div>
+        <p id="setup-message" class="message" role="status" aria-live="polite"></p>
+        <button class="primary-button" type="submit">Start game</button>
+      </form>
+
+      <section id="game-panel" class="game-panel" aria-label="Number guessing game" hidden>
+        <p class="range-display">
+          Guess a number between <strong id="range-min"></strong> and
+          <strong id="range-max"></strong>
+        </p>
+        <p id="feedback" class="feedback" role="status" aria-live="polite">
+          Enter your guess below to get started.
+        </p>
+
+        <form id="guess-form" class="guess-form">
+          <label for="guess">Your guess</label>
+          <div class="guess-fields">
+            <input id="guess" name="guess" type="number" step="1" inputmode="numeric" required />
+            <button class="primary-button" type="submit">Guess</button>
+          </div>
+        </form>
+
+        <div class="history">
+          <h3>Your guesses</h3>
+          <ol id="guess-history"></ol>
+        </div>
+
+        <button id="restart" class="text-button" type="button">
+          Choose a new range
+        </button>
+      </section>
+    </section>
+
+    <footer>Good luck, and have fun.</footer>
+  </main>
 </body>
+
 </html>

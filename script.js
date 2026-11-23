@@ -1,86 +1,102 @@
-const game = {
-  title: "Guess the Number!",
-  biggestNum: 10,
-  smallestNum: 1,
-  secretNum: null,
-  prevGuesses: [],
-  guess: "",
-  minRange: false,
-  maxRange: false,
-  play: function () {
-    this.bonus();
-    this.secretNum =
-      Math.floor(Math.random() * (this.biggestNum - this.smallestNum + 1)) +
-      this.smallestNum;
-    this.getGuess();
-  },
-  getGuess: function () {
-    while (this.guess !== "quit") {
-      this.guess = prompt(
-        `Enter a guess between ${this.smallestNum} and ${this.biggestNum} or 'quit' to exit:`
-      );
-      if (this.guess !== "quit") {
-        this.guess = parseInt(this.guess);
-        if (isNaN(this.guess) === false) {
-          if (this.guess >= this.smallestNum && this.guess <= this.biggestNum){
-            this.render();
-          } else {
-            alert(
-              `Please enter a number with your desired range ${this.smallestNum} - ${this.biggestNum}`
-            )
-          }
-        }
-      }
-    }
-  },
-  render: function () {
-    this.prevGuesses.push(this.guess);
-    if (this.guess === this.secretNum) {
-      alert(`Congrats! You guessed the number correctly! The secret number was ${this.secretNum}. You got it in ${this.prevGuesses.length}. tries`);
-      this.guess = "quit";
-    } else if (this.guess > this.secretNum) {
-      alert(
-        `You guessed too high! Try Again. Your previous guesses are ${this.prevGuesses}.`
-      );
-    } else if (this.guess < this.secretNum) {
-      alert(
-        `You guessed too low! Try Again. Your previous guesses are ${this.prevGuesses}.`
-        );
-    }
-  },
-  bonus: function () {
-    while (this.minRange === false) {
-      let min = prompt("Enter a minimum number: ");
-      if (min === "quit") {
-        this.guess = "quit";
-        this.minRange = true;
-      } else {
-        min = parseInt(min);
-        if (isNaN(min) === true) {
-          alert("Enter a real minimum number: ");
-        } else {
-          this.smallestNum = min;
-          this.minRange = true;
-        }
-      }
-    }
-    if (this.guess != "quit"){
-      while (this.maxRange === false) {
-        let max = prompt("Enter maximum number: ");
-        if (max === "quit") {
-          this.guess = "quit";
-          this.maxRange = true;
-        } else {
-          max = parseInt(max);
-          if (isNaN(max) === true) {
-            alert("Enter a real maximum number: ");
-          } else {
-            this.biggestNum = max;
-            this.maxRange = true;
-          }
-        }
-      }
-    }
-  },
-};
-game.play();
+"use strict";
+
+const setupForm = document.querySelector("#setup-form");
+const minimumInput = document.querySelector("#minimum");
+const maximumInput = document.querySelector("#maximum");
+const setupMessage = document.querySelector("#setup-message");
+const gamePanel = document.querySelector("#game-panel");
+const rangeMinimum = document.querySelector("#range-min");
+const rangeMaximum = document.querySelector("#range-max");
+const feedback = document.querySelector("#feedback");
+const guessForm = document.querySelector("#guess-form");
+const guessInput = document.querySelector("#guess");
+const guessHistory = document.querySelector("#guess-history");
+const restartButton = document.querySelector("#restart");
+
+let secretNumber;
+let minimum;
+let maximum;
+let guesses = [];
+
+/**
+ * Handles the submission of the setup form.
+ * @param {Event} event - The form submission event.
+ */
+setupForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+
+  const selectedMinimum = Number(minimumInput.value);
+  const selectedMaximum = Number(maximumInput.value);
+
+  if (
+    !Number.isSafeInteger(selectedMinimum) ||
+    !Number.isSafeInteger(selectedMaximum) ||
+    selectedMinimum > selectedMaximum ||
+    selectedMaximum - selectedMinimum > Number.MAX_SAFE_INTEGER
+  ) {
+    setupMessage.textContent =
+      "Choose whole-number bounds in order, with a range that JavaScript can safely handle.";
+    return;
+  }
+
+  minimum = selectedMinimum;
+  maximum = selectedMaximum;
+  secretNumber =
+    Math.floor(Math.random() * (maximum - minimum + 1)) + minimum;
+  guesses = [];
+  guessHistory.replaceChildren();
+  guessInput.value = "";
+  guessInput.min = String(minimum);
+  guessInput.max = String(maximum);
+  rangeMinimum.textContent = String(minimum);
+  rangeMaximum.textContent = String(maximum);
+  setupMessage.textContent = "";
+  feedback.textContent = "Enter your guess below to get started.";
+  guessInput.disabled = false;
+  guessForm.querySelector("button").disabled = false;
+  setupForm.hidden = true;
+  gamePanel.hidden = false;
+  guessInput.focus();
+});
+
+/**
+ * Handles the submission of the guess form.
+ * @param {Event} event - The form submission event.
+ */
+guessForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+
+  const guess = Number(guessInput.value);
+  if (!Number.isSafeInteger(guess) || guess < minimum || guess > maximum) {
+    feedback.textContent = `Enter a whole number between ${minimum} and ${maximum}.`;
+    return;
+  }
+
+  guesses.push(guess);
+  const guessItem = document.createElement("li");
+  guessItem.textContent = String(guess);
+  guessHistory.append(guessItem);
+  guessInput.value = "";
+
+  if (guess === secretNumber) {
+    feedback.textContent = `You got it! The number was ${secretNumber}. You found it in ${guesses.length} ${
+      guesses.length === 1 ? "guess" : "guesses"
+    }.`;
+    guessInput.disabled = true;
+    guessForm.querySelector("button").disabled = true;
+  } else if (guess > secretNumber) {
+    feedback.textContent = "Too high. Try a lower number.";
+  } else {
+    feedback.textContent = "Too low. Try a higher number.";
+  }
+});
+
+/**
+ * Handles the click event on the restart button to reset the game.
+ */
+restartButton.addEventListener("click", () => {
+  gamePanel.hidden = true;
+  setupForm.hidden = false;
+  setupMessage.textContent = "";
+  minimumInput.focus();
+});
